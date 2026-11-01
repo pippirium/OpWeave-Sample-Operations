@@ -49,4 +49,4 @@ The example shows only two dependencies; preserve all existing dependencies in a
 
 External Editor C# may execute during Unity's compile/reload. The OpWeave whitelist only controls OpWeave discovery and use; it is **not a sandbox**. Review extensions before importing; no credentials should be embedded in Git URLs or logs. This sample does not request permission changes or create CI workflows.
 
-For publishing a public GitHub repository, see [PUBLISHING.md](PUBLISHING.md).
+For public repository status and verification boundaries, see [PUBLISHING.md](PUBLISHING.md).
