@@ -1,18 +1,17 @@
-# Publishing as a standalone public GitHub repository
+# Public GitHub Repository Status and Verification Boundaries
 
-The target name/visibility was approved: `pippirium/OpWeave-Sample-Operations`, **public**.
+The standalone repository has been created and published: [`pippirium/OpWeave-Sample-Operations`](https://github.com/pippirium/OpWeave-Sample-Operations), **public**.
 
-This scaffold has **not** been published by ChatGPT. The current GitHub connection has no create-repository action, and the published package is not yet installable.
+## Repository publication vs runtime verification
 
-From the extracted root directory on a computer with `git` and authenticated GitHub CLI (`gh`):
+- **Repository status**: The initial external UPM scaffold is published to GitHub under the approved public repository [`pippirium/OpWeave-Sample-Operations`](https://github.com/pippirium/OpWeave-Sample-Operations).
+- **Runtime verification status**: Normal installation and runtime execution cannot yet be verified because the OpWeave Core package implementation (`com.opweave.workflow`) does not yet exist in `OpWeave-dev`.
+- Publication of this repository does **not** imply that the sample is verified or ready for production use.
 
-```sh
-git init -b main
-git add .
-git commit -m "feat: bootstrap external OpWeave sample UPM package"
-gh repo create pippirium/OpWeave-Sample-Operations --public --source=. --remote=origin --push
-```
+## Tagging and installation rules
 
-Keep the repository private until secrets/credentials and LICENSE are checked, but the owner has expressly authorized `public`. Make a tag only after the actual OpWeave Core API is implemented and Unity tests pass. Prefer pinned full commit IDs in Unity manifests and record tests on reviewed head SHA.
+- Create a release tag only after the actual OpWeave Core API is implemented and end-to-end Unity tests pass.
+- In Unity projects (`Packages/manifest.json`), use pinned full commit SHAs for both `com.opweave.workflow` and `com.opweave.sample.operations`.
+- Git UPM does not transitively resolve dependencies. Both packages must be explicitly added to the consumer project's manifest.
 
-**Do not report W2.13 or AT-F01 as passing just because these files exist.**
+**Do not report W2.13 or AT-F01 as passing just because this repository and scaffold files exist.**
