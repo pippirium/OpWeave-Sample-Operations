@@ -1,0 +1,13 @@
+{
+  "name": "OpWeave.Sample.Operations.Editor",
+  "rootNamespace": "OpWeave.Sample",
+  "references": [
+    "OpWeave.Core",
+    "OpWeave.UnityAdapter",
+    "Unity.Newtonsoft.Json"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": false
+}
