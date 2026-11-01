@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0",
+  "id": "example.make-bone-pose",
+  "nodes": [
+    {
+      "id": "start",
+      "operation": "core.start",
+      "version": 1
+    },
+    {
+      "id": "makePose",
+      "operation": "org.opweave.sample.make_pose",
+      "version": 1,
+      "parameters": {
+        "position": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    }
+  ],
+  "controlEdges": [
+    {
+      "from": "start",
+      "to": "makePose"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "pose",
+      "from": {
+        "node": "makePose",
+        "port": "pose"
+      }
+    }
+  ]
+}

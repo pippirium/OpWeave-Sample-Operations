@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "extensionId": "org.opweave.sample",
+  "displayName": "OpWeave Sample Operations",
+  "coreApi": {
+    "minInclusive": "1.0.0",
+    "maxExclusive": "2.0.0"
+  },
+  "unity": {
+    "minInclusive": "6000.0"
+  },
+  "assemblies": [
+    "OpWeave.Sample.Operations.Editor"
+  ],
+  "operations": [
+    {
+      "id": "org.opweave.sample.make_pose",
+      "version": 1
+    }
+  ],
+  "typeProviders": [
+    {
+      "id": "org.opweave.sample.types",
+      "assembly": "OpWeave.Sample.Operations.Editor"
+    }
+  ],
+  "examples": [
+    "Samples~/Workflows/create-bone-pose.opweave.json"
+  ],
+  "blueprints": []
+}

@@ -1,0 +1,11 @@
+# Unity and editor-generated output
+Library/
+Temp/
+Obj/
+Logs/
+UserSettings/
+.vs/
+.idea/
+*.csproj
+*.sln
+.DS_Store
