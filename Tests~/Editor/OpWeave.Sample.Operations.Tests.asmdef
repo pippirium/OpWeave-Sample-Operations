@@ -3,19 +3,27 @@
   "rootNamespace": "OpWeave.Sample.Tests",
   "references": [
     "OpWeave.Core",
+    "OpWeave.Operations",
     "OpWeave.UnityAdapter",
     "OpWeave.Testing",
     "OpWeave.Sample.Operations.Editor",
-    "Unity.Newtonsoft.Json"
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
   ],
   "includePlatforms": [
     "Editor"
   ],
-  "optionalUnityReferences": [
-    "TestAssemblies"
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll",
+    "Newtonsoft.Json.dll"
   ],
   "autoReferenced": false,
   "defineConstraints": [
     "UNITY_INCLUDE_TESTS"
-  ]
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

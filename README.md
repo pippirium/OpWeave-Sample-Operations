@@ -1,8 +1,8 @@
 # OpWeave Sample Operations
 
-An **external Git UPM example package** for OpWeave v1 (`W2.13` / SPEC §X). It demonstrates one custom `Operation`, one `TypeProvider`, one `Codec`, a complete Workflow, and Editor contract tests. OpWeave Core is not modified.
+An **external Git UPM extension package** for OpWeave v1 (`W2.13` / SPEC §X). It demonstrates one custom `Operation`, one `TypeProvider`, one `Codec`, a complete Workflow, and Editor contract tests — all against the implemented public OpWeave Core API. OpWeave Core is not modified.
 
-> **Status: scaffold, not a verified release.** The main OpWeave v1 product implementation does not yet exist in the referenced repository. The C# sources follow the approved SPEC APIs, but namespaces/signatures and Unity compilation must be reconciled and tested when the actual Core package is implemented. No validation or runtime behavior is claimed at this stage.
+> **Verification status:** The sources compile against the implemented `com.opweave.workflow` public contracts, and the contract tests under `Tests~/Editor/` exercise the real Core/UnityAdapter/`OpWeave.Testing` path — but they only prove anything once they run in a Unity `6000.0` EditMode session inside a consuming project. Until that run is reported, treat this package as implemented but not yet verified.
 
 ## Package identity
 
@@ -10,14 +10,15 @@ An **external Git UPM example package** for OpWeave v1 (`W2.13` / SPEC §X). It 
 - Extension ID: `org.opweave.sample`
 - Operation ID: `org.opweave.sample.make_pose@1`
 - Provider ID: `org.opweave.sample.types`
-- Type ID: `org.opweave.sample.BonePose`
+- Type ID: `org.opweave.sample.BonePose` (CLR `OpWeave.Sample.Types.BonePose`, Codec `BonePoseCodec`)
 - Required OpWeave public Core API: `>=1.0.0 <2.0.0`
 - Minimum Unity Editor: `6000.0`
 - Main Editor assembly: `OpWeave.Sample.Operations.Editor`
+- Test assembly: `OpWeave.Sample.Operations.Tests` (Editor-only, `UNITY_INCLUDE_TESTS`)
 
-## Installing (when OpWeave Core is available)
+## Installing
 
-Add both OpWeave Core and this external package **explicitly** to your Unity project's `Packages/manifest.json`. Use real pinned revisions (full commit SHAs), not fictitious tags:
+Add both OpWeave Core and this external package **explicitly** to your Unity project's `Packages/manifest.json`, pinned to full commit SHAs:
 
 ```json
 {
@@ -28,25 +29,38 @@ Add both OpWeave Core and this external package **explicitly** to your Unity pro
 }
 ```
 
-The example shows only two dependencies; preserve all existing dependencies in a real project. Git UPM does not transitively fetch the OpWeave Core package. An uncommitted or unpublished repository is not installable by this URL.
+The example shows only the two OpWeave dependencies; preserve all existing dependencies in a real project. Git UPM does not transitively fetch dependencies — `package.json` intentionally declares no Git-URL dependency on `com.opweave.workflow`, so omitting the first line leaves the extension unresolvable. The package does declare the ordinary Unity dependency `com.unity.nuget.newtonsoft-json`.
+
+## What the extension registers
+
+- **`org.opweave.sample.make_pose@1`** — an `Immediate`, read-only, idempotent custom Operation. It reads `position` (`unity.Vector3`, required) and writes `pose` (`org.opweave.sample.BonePose`). Declared effects: `read` only; `UndoSupport.None`; requirement `edit_mode`; stateless.
+- **`org.opweave.sample.types`** — an `ITypeProvider` offering the value type **`org.opweave.sample.BonePose`**, a finite 3D pose, with the strict **`BonePoseCodec`**: JSON is exactly `{"x":number,"y":number,"z":number}` — no missing members, no extra members, finite values inside the `float` range — and `Normalize` is `ToJson(FromJson(value))`, deterministic and idempotent.
+
+`Editor/Blueprints~/` ships a single inert `*.opweave-blueprint.json` file as a marker of where future Blueprint content would live; v1 registers and executes nothing from it (SPEC §X.8–X.9).
 
 ## Example workflow
 
-`Samples~/Workflows/create-bone-pose.opweave.json` declares `core.start → org.opweave.sample.make_pose`, with `position: {"x":0,"y":1,"z":0}`. It exposes the `pose` result as a custom BonePose value. No scene or asset changes are expected.
+`Samples~/Workflows/create-bone-pose.opweave.json` is a complete schema-`1.0` workflow: `core.start → org.opweave.sample.make_pose` (control edge `next`), input `position: {"x":0,"y":1,"z":0}`, and the workflow output `pose` bound to the custom node's `pose` port.
 
-## Test/acceptance checklist (not run)
+**Expected result:** the run produces a `BonePose` whose `Position` is `(0, 1, 0)` — canonical JSON `{"x":0,"y":1,"z":0}` — and nothing else. The Operation performs no scene, asset, package, code, or other project-state changes. The same document is embedded in the Descriptor's `Examples`.
 
-1. Install both packages into a Unity 6000.0+ Editor project. The shipped Core needs to support the approved SPEC's `Normalize` API.
-2. Confirm an Editor-only compiled assembly and extension manifest metadata are consistent; the sample must not enter Player builds.
-3. Confirm the provider and custom type register and the Operation is searchable as `origin=custom`.
-4. Verify the complete Workflow with the actual Validator, then execute it and check the Pose output; these are separate acceptance tests.
-5. Verify `Codec.Normalize` round-trip/byte determinism and idempotency; run `Tests~/Editor` from a test project with `com.opweave.workflow` in `testables` and the documented `OpWeave.Testing` assembly available.
-6. Uninstall this package and verify Operation/Type/Provider disappear on reload. Reinstall the same pinned commit and verify reappearance.
-7. Exercise `DiscoveryMode=whitelist`, failed metadata/API range, wrong Editor assembly, duplicate IDs, version changes, and diagnostic behavior. Confirm no changes to the OpWeave Core repository.
-8. Record the Unity version, compiler/test command, exact package commits, test results, and reviewer. Do not mark W2.13/AT-F01 complete based on this scaffold.
+## Running the contract tests
+
+Unity never compiles folders suffixed with `~`, so `Tests~/Editor/` ships as source inside the package but must be staged into the consuming project:
+
+1. Install both packages as above into a Unity `6000.0` project that has `"com.opweave.workflow"` in its `testables` list (OpWeave.Core's `OpWeave.Testing` assembly is `UNITY_INCLUDE_TESTS`-gated).
+2. Copy the resolved package's `Tests~/Editor/` (contents, not the folder) into the project's `Assets/` — e.g. `Assets/OpWeave.Sample.Operations.Tests.Editor/` — keeping the `.asmdef` and `.meta` files.
+3. Run EditMode tests; the `OpWeave.Sample.Operations.Tests` assembly covers:
+   - Operation eligibility, `[OpWeaveOperation]` ↔ Descriptor identity, and the full Descriptor contract (ports, effects, idempotency, requirements, examples);
+   - Descriptor registration checks against a snapshot that includes this package's TypeProvider, and static validation of every Descriptor example through the real workflow compiler;
+   - Harness execution of `make_pose` with the declared pose output, plus `OperationContract` idempotency and declared-effects probes;
+   - Codec `Validate`/`Normalize`/`FromJson`/`ToJson` contract (strict shape, OW-TYPE-003 diagnostics, canonical determinism);
+   - TypeProvider eligibility and registration alongside the standard providers;
+   - `opweave.extension.json` parsing, manifest-validator acceptance, and live `ExtensionDiscovery` acceptance of the installed package;
+   - static validation, Dry-Run validation, and execution of every `Samples~/Workflows/*.opweave.json` — located via `PackageInfo`, never a hard-coded path — including the prohibited-API IL scan of the production assembly.
 
 ## Security and boundaries
 
-External Editor C# may execute during Unity's compile/reload. The OpWeave whitelist only controls OpWeave discovery and use; it is **not a sandbox**. Review extensions before importing; no credentials should be embedded in Git URLs or logs. This sample does not request permission changes or create CI workflows.
+External Editor C# may execute during Unity's compile/reload. The OpWeave discovery whitelist controls OpWeave registration only; it is **not a sandbox**. Review extensions before importing; no credentials should be embedded in Git URLs or logs. This sample requests no permission changes and creates no CI workflows.
 
 For public repository status and verification boundaries, see [PUBLISHING.md](PUBLISHING.md).
