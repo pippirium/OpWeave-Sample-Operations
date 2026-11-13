@@ -55,17 +55,23 @@ namespace OpWeave.Sample.Tests
         }
 
         [Test]
-        public void ValidateRejectsNonFiniteMembers()
+        public void NonFiniteMembersAreRejectedBeforeTheCodec()
         {
-            var value = JsonValue.From(new JObject
+            // Canonical JSON (SPEC §0.3) has no NaN or Infinity, so building a
+            // JsonValue from a non-finite token throws before Validate can run.
+            Assert.Throws<ArgumentException>(() => JsonValue.From(new JObject
             {
                 ["x"] = new JValue(double.PositiveInfinity),
                 ["y"] = new JValue(0.0),
                 ["z"] = new JValue(0.0),
-            });
+            }));
+
+            // A number token overflowing finite binary64 fails strict parsing.
+            var overflow = JsonValue.Parse("{\"x\":1e400,\"y\":0,\"z\":0}");
+            Assert.IsFalse(overflow.Ok,
+                "a number outside finite binary64 must fail JsonValue.Parse");
             Assert.IsTrue(
-                s_codec.Validate(value, null)
-                    .Any(d => d.Severity == Severity.Error));
+                overflow.Diagnostics.Any(d => d.Severity == Severity.Error));
         }
 
         // ── Normalize (SPEC §B7.1) ────────────────────────────────────────
