@@ -57,7 +57,7 @@ Unity never compiles folders suffixed with `~`, so `Tests~/Editor/` ships as sou
    - Codec `Validate`/`Normalize`/`FromJson`/`ToJson` contract (strict shape, OW-TYPE-003 diagnostics, canonical determinism);
    - TypeProvider eligibility and registration alongside the standard providers;
    - `opweave.extension.json` parsing, manifest-validator acceptance, and live `ExtensionDiscovery` acceptance of the installed package;
-   - static validation, Dry-Run validation, and execution of every `Samples~/Workflows/*.opweave.json` — located via `PackageInfo`, never a hard-coded path — including the prohibited-API IL scan of the production assembly.
+   - static validation, Dry-Run validation, and end-to-end execution of every `Samples~/Workflows/*.opweave.json` — located via `PackageInfo`, never a hard-coded path — including the prohibited-API IL scan of the production assembly. Each workflow is submitted to the installed Agent API service (`AgentApiHost.Api`) exactly as an Agent submits it: `validate_workflow`, then `execute_workflow` with the returned `planHash` as `expectedPlanHash`, then `get_run_status` polled to a terminal `Succeeded` Run whose `outputs.pose` decodes through `BonePoseCodec` to `Position (0, 1, 0)`, and `get_run_logs` confirming an empty change list.
 
 ## Security and boundaries
 

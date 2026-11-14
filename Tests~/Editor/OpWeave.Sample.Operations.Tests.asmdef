@@ -2,6 +2,7 @@
   "name": "OpWeave.Sample.Operations.Tests",
   "rootNamespace": "OpWeave.Sample.Tests",
   "references": [
+    "OpWeave.AgentApi",
     "OpWeave.Core",
     "OpWeave.Operations",
     "OpWeave.UnityAdapter",
