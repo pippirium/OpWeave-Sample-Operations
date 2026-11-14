@@ -23,6 +23,7 @@
   "controlEdges": [
     {
       "from": "start",
+      "fromPort": "next",
       "to": "makePose"
     }
   ],

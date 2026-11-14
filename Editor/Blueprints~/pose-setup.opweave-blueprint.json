@@ -1,0 +1,5 @@
+{
+  "blueprintVersion": "reserved",
+  "id": "example.pose-setup",
+  "description": "Reserved non-executable Blueprint sample (SPEC §X.2, §X.10). v1 never registers or executes Blueprints; this file under Editor/Blueprints~/ is inert content that demonstrates where a future Blueprint distribution would live. When Blueprint publication is enabled, the normative location is Editor/Blueprints/ instead."
+}

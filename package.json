@@ -4,6 +4,9 @@
   "displayName": "OpWeave Sample Operations",
   "description": "Example external Git UPM extension with a custom Operation, TypeProvider and Codec for OpWeave v1.",
   "unity": "6000.0",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.2"
+  },
   "author": {
     "name": "OpWeave sample contributors"
   },
