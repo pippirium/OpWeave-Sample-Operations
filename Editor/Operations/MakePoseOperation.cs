@@ -58,13 +58,20 @@ namespace OpWeave.Sample.Operations
         public override StepResult Execute(StepContext ctx)
         {
             var position = ctx.Get<Vector3>("position");
-            var pose = new BonePose(position);
-            // The pose port's Codec lives in this package's TypeProvider, so the
-            // value is written through BonePoseCodec itself as canonical JSON —
-            // the same form the port's registered Codec would produce.
-            ctx.SetOutput("pose", new BonePoseCodec().ToJson(pose));
+            // Revision 2 (T-W2.13-02): the conversion moved into ToPoseJson.
+            // Behaviour is identical; the compiled implementation differs so
+            // source-change invalidation (SPEC §X.11 item 4) can be tested
+            // against two pinned revisions.
+            ctx.SetOutput("pose", ToPoseJson(position));
             return StepResult.Succeeded();
         }
+
+        /// <summary>Converts a position into the canonical BonePose JSON.</summary>
+        // The pose port's Codec lives in this package's TypeProvider, so the
+        // value is written through BonePoseCodec itself as canonical JSON —
+        // the same form the port's registered Codec would produce.
+        private static JsonValue ToPoseJson(Vector3 position) =>
+            new BonePoseCodec().ToJson(new BonePose(position));
 
         private static OperationDescriptor BuildDescriptor() => Op
             .Define("org.opweave.sample.make_pose", 1)
